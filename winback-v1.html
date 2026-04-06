@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Win-Back Decision Tool — V1</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f9f8f6;
+    --surface: #ffffff;
+    --border: #e5e2db;
+    --border-mid: #ccc9c0;
+    --text: #1a1916;
+    --text-2: #6b6860;
+    --text-3: #a09d96;
+    --accent: #1a1916;
+    --danger-bg: #fff1f0;
+    --danger-border: #fcc9c5;
+    --danger-text: #c0392b;
+    --success-bg: #f0faf4;
+    --success-border: #b7e4c7;
+    --success-text: #1e7e45;
+    --warn-bg: #fffbf0;
+    --warn-border: #fde68a;
+    --warn-text: #92610a;
+    --info-bg: #f0f6ff;
+    --info-border: #bfdbfe;
+    --info-text: #1d4ed8;
+    --secondary-bg: #f4f2ee;
+    --mono: 'Courier New', Courier, monospace;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141412;
+      --surface: #1e1d1b;
+      --border: #2e2c28;
+      --border-mid: #3d3b36;
+      --text: #f0ede8;
+      --text-2: #a09d96;
+      --text-3: #6b6860;
+      --accent: #f0ede8;
+      --danger-bg: #2a1210;
+      --danger-border: #7f2020;
+      --danger-text: #f87171;
+      --success-bg: #0d2118;
+      --success-border: #166534;
+      --success-text: #4ade80;
+      --warn-bg: #1f1a09;
+      --warn-border: #854d0e;
+      --warn-text: #fbbf24;
+      --info-bg: #0d1a2e;
+      --info-border: #1e3a5f;
+      --info-text: #60a5fa;
+      --secondary-bg: #252320;
+    }
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .shell {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .version-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: normal;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+
+  h1 span {
+    color: var(--text-3);
+  }
+
+  .stage-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 8px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .question {
+    font-size: 17px;
+    font-weight: normal;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+  }
+
+  .sub {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    color: var(--text-2);
+    margin-bottom: 1.25rem;
+    line-height: 1.65;
+  }
+
+  .btn-group { display: flex; flex-direction: column; gap: 6px; }
+
+  .btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    line-height: 1.4;
+    width: 100%;
+    transition: border-color 0.12s, background 0.12s;
+  }
+
+  .btn:hover { background: var(--secondary-bg); border-color: var(--border-mid); }
+  .btn:active { transform: scale(0.99); }
+
+  .confirm-btn {
+    background: var(--success-bg);
+    border: 1px solid var(--success-border);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    color: var(--success-text);
+    cursor: pointer;
+    text-align: left;
+    line-height: 1.4;
+    width: 100%;
+    transition: opacity 0.12s;
+  }
+  .confirm-btn:hover { opacity: 0.82; }
+
+  .outcome {
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .outcome-cancel { background: var(--danger-bg); border: 1px solid var(--danger-border); }
+  .outcome-success { background: var(--success-bg); border: 1px solid var(--success-border); }
+
+  .outcome-title {
+    font-size: 16px;
+    font-weight: normal;
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+  }
+  .outcome-cancel .outcome-title { color: var(--danger-text); }
+  .outcome-success .outcome-title { color: var(--success-text); }
+
+  .steps { list-style: none; padding: 0; }
+  .steps li {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    padding: 5px 0 5px 18px;
+    position: relative;
+    line-height: 1.55;
+  }
+  .steps li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 10px;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.45;
+  }
+  .outcome-cancel .steps li { color: var(--danger-text); }
+  .outcome-success .steps li { color: var(--success-text); }
+
+  .macro-pill {
+    display: inline-block;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-2);
+    letter-spacing: 0.04em;
+    margin-top: 10px;
+  }
+
+  .info-box {
+    background: var(--secondary-bg);
+    border-left: 2px solid var(--border-mid);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 1rem;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.65;
+  }
+
+  .warn-note {
+    background: var(--warn-bg);
+    border-left: 2px solid var(--warn-border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 1rem;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    color: var(--warn-text);
+    line-height: 1.65;
+  }
+
+  .save-box {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .save-box-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 10px;
+  }
+
+  .save-code {
+    display: block;
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.18em;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 6px;
+  }
+
+  .save-sublabel {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: 10px;
+  }
+
+  .copy-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 7px 14px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .copy-btn:hover { background: var(--bg); }
+  .copy-btn.copied { color: var(--success-text); border-color: var(--success-border); }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .divider-line { flex: 1; height: 1px; background: var(--border); }
+  .divider-text {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    color: var(--text-3);
+    white-space: nowrap;
+  }
+
+  .resume-input {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    margin-bottom: 8px;
+    outline: none;
+    transition: border-color 0.12s;
+  }
+  .resume-input:focus { border-color: var(--border-mid); }
+  .resume-input.error { border-color: var(--danger-border); }
+
+  .error-msg {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    color: var(--danger-text);
+    margin-bottom: 8px;
+    display: none;
+  }
+
+  .breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  .crumb {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    color: var(--text-3);
+  }
+  .crumb-sep { font-size: 11px; color: var(--border-mid); }
+
+  .restart-btn {
+    background: none;
+    border: none;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    color: var(--text-3);
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .restart-btn:hover { color: var(--text-2); }
+
+  .resumed-tag {
+    display: inline-block;
+    background: var(--info-bg);
+    border: 1px solid var(--info-border);
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--info-text);
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="version-badge">V1 — Informational</div>
+    <h1>Win-Back Decision Tool <span>/ CX Guide</span></h1>
+  </header>
+  <div id="app"></div>
+</div>
+
+<script>
+const S = { step: 'start', path: [], cancelType: null, orderStatus: null, subStatus: null, reason: null, resumed: false };
+
+const reasonConditionals = {
+  too_expensive: 'TOO EXPENSIVE', didnt_work: "DIDN'T WORK", too_many_tins: 'TOO MANY TINS',
+  melted: 'MELTED', order_as_needed: 'PREFER TO ORDER AS NEEDED', buy_elsewhere: 'PREFER TO BUY ELSEWHERE',
+  didnt_mean: "DIDN'T MEAN TO SUBSCRIBE", bad_reviews: 'BAD REVIEWS'
+};
+
+const crumbMap = {
+  start: 'Start', check_winback_tag: 'Tag check', check_order_status: 'Order status',
+  hold_order: 'Hold order', check_sub_status: 'Sub timing', push_sub: 'Push sub',
+  reason_known: 'Reason known?', request_reason: 'Request reason', select_reason: 'Reason',
+  winback_attempt: 'Win-back sent', winback_checkin: 'Check-in', winback_replied: 'Replied'
+};
+
+function crumb(s) { return crumbMap[s] || s; }
+
+function encodeState(snoozePoint) {
+  const stepCodes = { request_reason: 'RR', winback_attempt: 'WA', winback_checkin: 'WC' };
+  const orderCodes = { stage10: '1', stage20: '2', shipped: 'S', none: 'N' };
+  const subCodes = { soon: 'S', later: 'L' };
+  const reasonCodes = { too_expensive: 'A', didnt_work: 'B', too_many_tins: 'C', melted: 'D', order_as_needed: 'E', buy_elsewhere: 'F', didnt_mean: 'G', bad_reviews: 'H' };
+  return (stepCodes[snoozePoint] || 'XX') + (orderCodes[S.orderStatus] || '0') + (subCodes[S.subStatus] || '0') + (reasonCodes[S.reason] || '0');
+}
+
+function decodeCode(code) {
+  code = code.toUpperCase().trim();
+  if (code.length !== 5) return null;
+  const stepMap = { RR: 'request_reason_return', WA: 'winback_attempt_return', WC: 'winback_checkin_return' };
+  const orderMap = { '1': 'stage10', '2': 'stage20', S: 'shipped', N: 'none', '0': null };
+  const subMap = { S: 'soon', L: 'later', '0': null };
+  const reasonMap = { A: 'too_expensive', B: 'didnt_work', C: 'too_many_tins', D: 'melted', E: 'order_as_needed', F: 'buy_elsewhere', G: 'didnt_mean', H: 'bad_reviews', '0': null };
+  const sc = code.slice(0, 2);
+  if (!stepMap[sc]) return null;
+  if (orderMap[code[2]] === undefined || subMap[code[3]] === undefined || reasonMap[code[4]] === undefined) return null;
+  return { step: stepMap[sc], orderStatus: orderMap[code[2]], subStatus: subMap[code[3]], reason: reasonMap[code[4]] };
+}
+
+function go(next, key, val) {
+  S.path.push(S.step);
+  if (key) S[key] = val;
+  S.step = next;
+  render();
+}
+
+function restart() {
+  Object.assign(S, { step: 'start', path: [], cancelType: null, orderStatus: null, subStatus: null, reason: null, resumed: false });
+  render();
+}
+
+function copyCode(code) {
+  navigator.clipboard.writeText('Win-back resume code: ' + code).then(() => {
+    const btn = document.getElementById('cb-' + code);
+    if (btn) { btn.textContent = 'Copied!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = 'Copy to clipboard'; btn.classList.remove('copied'); }, 2000); }
+  });
+}
+
+function tryResume() {
+  const val = document.getElementById('resume-input').value;
+  const decoded = decodeCode(val);
+  if (!decoded) {
+    document.getElementById('resume-input').classList.add('error');
+    document.getElementById('resume-error').style.display = 'block';
+    return;
+  }
+  Object.assign(S, decoded, { resumed: true, path: [] });
+  render();
+}
+
+function saveBox(snoozePoint) {
+  const code = encodeState(snoozePoint);
+  const labels = { request_reason: 'Waiting for cancellation reason', winback_attempt: 'Waiting for win-back reply', winback_checkin: 'Waiting for check-in reply' };
+  return `<div class="save-box">
+    <div class="save-box-title">Save this code in Gorgias before you snooze</div>
+    <span class="save-code">${code}</span>
+    <div class="save-sublabel">${labels[snoozePoint] || ''}</div>
+    <div style="font-size:12px;color:var(--text-2);margin-bottom:10px;font-family:'Helvetica Neue',Arial,sans-serif;">1. Click <strong>Copy to clipboard</strong> below &nbsp; 2. In Gorgias, open the ticket &rarr; click <strong>Add note</strong> &rarr; paste &rarr; submit &nbsp; 3. Then snooze the ticket as normal.</div>
+    <button class="copy-btn" id="cb-${code}" onclick="copyCode('${code}')">Copy to clipboard</button>
+  </div>`;
+}
+
+function bc() {
+  if (!S.path.length) return '';
+  let h = '<div class="breadcrumb">';
+  S.path.forEach(p => { h += `<span class="crumb">${crumb(p)}</span><span class="crumb-sep"> › </span>`; });
+  h += `<span class="crumb" style="color:var(--text)">${crumb(S.step)}</span></div>`;
+  h += '<button class="restart-btn" onclick="restart()">← Start over</button>';
+  return h;
+}
+
+function card(stage, question, sub, body) {
+  const rt = S.resumed ? '<span class="resumed-tag">Resumed from snooze</span><br>' : '';
+  return `${bc()}<div class="card">${rt}${stage ? `<div class="stage-label">${stage}</div>` : ''}<div class="question">${question}</div>${sub ? `<div class="sub">${sub}</div>` : ''}${body}</div>`;
+}
+
+function btns(choices) {
+  return '<div class="btn-group">' + choices.map(([l, f]) => `<button class="btn" onclick="${f}">${l}</button>`).join('') + '</div>';
+}
+
+function outcome(type, title, items, macro) {
+  const cls = type === 'success' ? 'outcome-success' : 'outcome-cancel';
+  let h = `${bc()}<div class="outcome ${cls}"><div class="outcome-title">${title}</div><ul class="steps">`;
+  items.forEach(i => { h += `<li>${i}</li>`; });
+  h += '</ul>';
+  if (macro) h += `<div><span class="macro-pill">${macro}</span></div>`;
+  h += '</div><button class="restart-btn" onclick="restart()">← Start a new cancellation</button>';
+  return h;
+}
+
+function render() {
+  const s = S.step;
+  let html = '';
+
+  if (s === 'start') {
+    html = `<div class="card">
+      <div class="stage-label">Stage 1 — Eligibility check</div>
+      <div class="question">What does the customer want to cancel?</div>
+      <div class="sub">Check their Shopify profile for an existing win-back tag before proceeding.</div>
+      ${btns([
+        ['Subscription cancellation', "go('check_winback_tag','cancelType','sub_cancel')"],
+        ['Order cancellation — has an active subscription', "go('check_winback_tag','cancelType','order_with_sub')"],
+        ['Order cancellation — one-time order (no subscription)', "go('no_winback_onetime')"],
+        ['Order cancellation — subscription already cancelled', "go('no_winback_postsub')"],
+      ])}
+      <div class="divider"><div class="divider-line"></div><div class="divider-text">returning from a snooze?</div><div class="divider-line"></div></div>
+      <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;color:var(--text-2);margin-bottom:8px;">Enter the code saved in Gorgias to pick up where you left off.</div>
+      <input class="resume-input" id="resume-input" maxlength="5" placeholder="XXXXX" oninput="this.value=this.value.toUpperCase();this.classList.remove('error');document.getElementById('resume-error').style.display='none'" onkeydown="if(event.key==='Enter')tryResume()" />
+      <div class="error-msg" id="resume-error">Code not recognised — please check and try again.</div>
+      <button class="btn" onclick="tryResume()">Resume from code →</button>
+    </div>`;
+
+  } else if (s === 'check_winback_tag') {
+    html = card('Stage 1 — Win-back tag check', 'Does this customer already have a win-back tag on their Shopify profile?', 'Look for "winback-success" or "winback-fail" tags.',
+      btns([['Yes — a win-back tag exists', "go('no_winback_tagged')"], ['No — no win-back tag found', "go('check_order_status')"]]));
+
+  } else if (s === 'check_order_status') {
+    html = card('Stage 2A — Order status', 'What is the current order status in DCL?', null,
+      btns([
+        ['Unfulfilled — Stage 10 in DCL', "go('hold_order','orderStatus','stage10')"],
+        ['Unfulfilled — Stage 20 in DCL', "go('hold_order','orderStatus','stage20')"],
+        ['Already shipped — Stage 40 or 60 in DCL', "go('check_sub_status','orderStatus','shipped')"],
+        ['No unfulfilled order', "go('check_sub_status','orderStatus','none')"],
+      ]));
+
+  } else if (s === 'hold_order') {
+    html = card('Stage 2A — Action required', 'Put the order on hold in DCL before continuing.', null,
+      `<div class="warn-note">In DCL, put the order on hold with the note: <strong>"Holding for customer response — [your initials]"</strong>. Then complete the internal note in Gorgias.</div><div style="margin-bottom:1rem"><span class="macro-pill">[Internal] DCL Hold — Win Back</span></div>` +
+      btns([['Done — order is on hold →', "go('check_sub_status')"]]));
+
+  } else if (s === 'check_sub_status') {
+    html = card('Stage 2B — Subscription timing', 'When is the customer\'s next subscription order due?', null,
+      btns([['Less than 7 days away', "go('push_sub','subStatus','soon')"], ['7 or more days away', "go('reason_known','subStatus','later')"]]));
+
+  } else if (s === 'push_sub') {
+    html = card('Stage 2B — Action required', 'Move the next order date in Stay.ai before continuing.', null,
+      `<div class="warn-note">In Stay.ai, move the next order date to <strong>7 days from today</strong>. Then complete the internal note in Gorgias.</div><div style="margin-bottom:1rem"><span class="macro-pill">[Internal] DCL Hold — Win Back</span></div>` +
+      btns([['Done — date has been moved →', "go('reason_known')"]]));
+
+  } else if (s === 'reason_known') {
+    html = card('Stage 3 — Cancellation reason', 'Has the customer told you why they want to cancel?', null,
+      btns([['Yes — I know their reason', "go('select_reason')"], ['No — reason unknown', "go('request_reason')"]]));
+
+  } else if (s === 'request_reason') {
+    const shipped = S.orderStatus === 'shipped';
+    html = card('Stage 3 — Request reason', 'Ask the customer for their cancellation reason.', null,
+      `<div class="info-box">Send the <strong>"CANCEL — REASON NEEDED"</strong> macro.${shipped ? ' Include the "CAN\'T CANCEL ORDER" conditional — their order has already shipped.' : ' Remove the "CAN\'T CANCEL" conditional.'} Snooze the ticket for 2 days. If no reply, send a check-in and snooze 2 more days.</div><div style="margin-bottom:1rem"><span class="macro-pill">CANCEL — REASON NEEDED</span></div>` +
+      saveBox('request_reason') +
+      btns([['Customer replied with a reason →', "go('select_reason')"], ['No reply after follow-up — cancel', "go('no_reply_cancel')"]]));
+
+  } else if (s === 'request_reason_return') {
+    html = card('Stage 3 — Returning from snooze', 'Did the customer reply with a cancellation reason?', null,
+      btns([['Yes — they replied with a reason', "go('select_reason')"], ['No reply — send check-in and snooze 2 more days', "go('request_reason_checkin')"]]));
+
+  } else if (s === 'request_reason_checkin') {
+    html = card('Stage 3 — No reply', 'Send a check-in and snooze 2 more days.', null,
+      `<div class="info-box">Send the customer a check-in message asking if they still need help. Snooze the ticket for 2 more days.</div>` +
+      saveBox('request_reason') +
+      btns([['Customer replied with a reason →', "go('select_reason')"], ['Still no reply — cancel', "go('no_reply_cancel')"]]));
+
+  } else if (s === 'select_reason') {
+    html = card('Stage 4 — Cancellation reason', 'Select the customer\'s cancellation reason:', null,
+      btns([
+        ['Too expensive', "go('winback_attempt','reason','too_expensive')"],
+        ["Product didn't work", "go('winback_attempt','reason','didnt_work')"],
+        ['Too many tins', "go('winback_attempt','reason','too_many_tins')"],
+        ['Product melted', "go('winback_attempt','reason','melted')"],
+        ['Prefer to order as needed', "go('winback_attempt','reason','order_as_needed')"],
+        ['Prefer to buy elsewhere', "go('winback_attempt','reason','buy_elsewhere')"],
+        ["Didn't mean to subscribe", "go('winback_attempt','reason','didnt_mean')"],
+        ['Bad reviews', "go('winback_attempt','reason','bad_reviews')"],
+        ['Upset / complaint', "go('no_winback_reason')"],
+        ['Medical reason', "go('no_winback_reason')"],
+        ["Doesn't like the taste", "go('no_winback_reason')"],
+        ["Can't afford / overdrawn (unfulfilled order)", "go('no_winback_reason')"],
+      ]));
+
+  } else if (s === 'winback_attempt' || s === 'winback_attempt_return') {
+    const conditional = reasonConditionals[S.reason] || '';
+    const shipped = S.orderStatus === 'shipped';
+    const isReturn = s === 'winback_attempt_return';
+    html = card(
+      isReturn ? 'Stage 5 — Returning from snooze' : 'Stage 4–5 — Win-back attempt',
+      isReturn ? 'Did the customer reply to the win-back offer?' : 'Send the win-back offer to the customer.', null,
+      (isReturn ? '' : `<div class="info-box">Reply using the <strong>"WIN BACK — ATTEMPT"</strong> macro, selecting the <strong>"${conditional}"</strong> conditional.${shipped ? ' Include the "CAN\'T CANCEL ORDER" conditional — their order has already shipped, but the subscription win-back can still proceed.' : ' Remove the "CAN\'T CANCEL" conditional.'} Snooze the ticket for 2 days.</div><div style="margin-bottom:1rem"><span class="macro-pill">WIN BACK — ATTEMPT</span></div>` + saveBox('winback_attempt')) +
+      btns([['Customer replied →', "go('winback_replied')"], ['No reply after 2 days →', "go('winback_checkin')"]]));
+
+  } else if (s === 'winback_checkin' || s === 'winback_checkin_return') {
+    const isReturn = s === 'winback_checkin_return';
+    html = card(
+      isReturn ? 'Stage 5 — Returning from snooze' : 'Stage 5 — Check-in',
+      isReturn ? 'Did the customer reply to your check-in?' : 'Send the customer a check-in.', null,
+      (isReturn ? '' : `<div class="info-box">Send the <strong>"WIN BACK — CHECK-IN"</strong> macro. Snooze the ticket for 2 more days.</div><div style="margin-bottom:1rem"><span class="macro-pill">WIN BACK — CHECK-IN</span></div>` + saveBox('winback_checkin')) +
+      btns([['Customer replied →', "go('winback_replied')"], ['Still no reply →', "go('outcome_fail')"]]));
+
+  } else if (s === 'winback_replied') {
+    html = card('Stage 6 — Final decision', 'Did the customer accept the win-back offer?', null,
+      btns([['Yes — they accepted', "go('outcome_success')"], ['No — they still want to cancel', "go('outcome_fail')"]]));
+
+  } else if (s === 'outcome_success') {
+    const shipped = S.orderStatus === 'shipped';
+    html = outcome('success', 'Win-back successful', [
+      'Tag the customer\'s Shopify profile with "winback-success".',
+      shipped ? 'The order has already shipped — no release needed.' : 'Release the order in DCL (unfulfilled orders only).',
+      'Apply a 40% discount code to the subscription(s) in Stay.ai.',
+      'Reply using the "WIN BACK — SUCCESS" macro.', 'Close the ticket.',
+    ], 'WIN BACK — SUCCESS');
+
+  } else if (s === 'outcome_fail') {
+    html = outcome('cancel', 'Win-back failed — proceed to cancellation', [
+      'Tag the customer\'s Shopify profile with "winback-fail".',
+      'Cancel the order in DCL & Shopify per the cancellation guidelines.',
+      'Cancel the subscription(s) in Stay.ai.',
+      'Reply using the "WIN BACK — FAIL" macro.', 'Close the ticket.',
+    ], 'WIN BACK — FAIL');
+
+  } else if (s === 'no_reply_cancel') {
+    html = outcome('cancel', 'No reply — proceed to cancellation', [
+      'Customer did not respond after two follow-up attempts.',
+      'Cancel the order in DCL & Shopify per the cancellation guidelines.',
+      'Cancel the subscription(s) in Stay.ai.',
+      'Reply using the "CANCEL BOTH" macro with the "UPSET" conditional.', 'Close the ticket.',
+    ], 'CANCEL — BOTH');
+
+  } else if (s === 'no_winback_onetime') {
+    html = outcome('cancel', 'No win-back — one-time order', ['This is a one-time order with no active subscription.', 'No win-back attempt is made.', 'Proceed directly to the cancellation guidelines.']);
+  } else if (s === 'no_winback_postsub') {
+    html = outcome('cancel', 'No win-back — subscription already cancelled', ['The subscription has already been cancelled.', 'No win-back attempt is made.', 'Proceed directly to the cancellation guidelines.']);
+  } else if (s === 'no_winback_tagged') {
+    html = outcome('cancel', 'No win-back — already attempted', ['This customer already has a win-back tag on their Shopify profile.', 'No further win-back attempt should be made.', 'Proceed directly to the cancellation guidelines.']);
+  } else if (s === 'no_winback_reason') {
+    html = outcome('cancel', 'No win-back — proceed to cancellation', [
+      'This cancellation reason does not qualify for a win-back attempt.',
+      'Cancel the order in DCL & Shopify per the cancellation guidelines.',
+      'Cancel the subscription(s) in Stay.ai.',
+      'Reply using the "CANCEL BOTH" macro with the "UPSET" conditional.', 'Close the ticket.',
+    ], 'CANCEL — BOTH');
+  }
+
+  document.getElementById('app').innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>
