@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Win-Back Decision Tool — V3</title>
+<title>Winback Decision Tool — V3</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -17,7 +17,6 @@
     --text: #1C1A15;
     --text-2: #6B6456;
     --text-3: #A89F92;
-    --accent: #1C1A15;
     --danger-bg: #FEF2F0;
     --danger-border: #F5C4BC;
     --danger-text: #B83A2A;
@@ -30,18 +29,19 @@
     --info-bg: #F0F4FE;
     --info-border: #B8CEFA;
     --info-text: #1A3EB8;
-    --tag-dcl: #EEF4FF;
-    --tag-dcl-border: #C0D4FF;
-    --tag-dcl-text: #1E40AF;
-    --tag-shopify: #F0FDF4;
-    --tag-shopify-border: #A0DFBA;
-    --tag-shopify-text: #14663A;
-    --tag-stay: #FDF4FF;
-    --tag-stay-border: #DDB8F8;
-    --tag-stay-text: #6B21A8;
-    --tag-gorgias: #FFF8F0;
-    --tag-gorgias-border: #F8D0A0;
-    --tag-gorgias-text: #92450A;
+    /* System colors — matched to screenshots */
+    --dcl-bg: #EEF4FF;
+    --dcl-border: #C0D4FF;
+    --dcl-text: #1E40AF;
+    --shopify-bg: #F0FDF4;
+    --shopify-border: #A0DFBA;
+    --shopify-text: #14663A;
+    --stay-bg: #FDF4FF;
+    --stay-border: #DDB8F8;
+    --stay-text: #6B21A8;
+    --gorgias-bg: #FFF8F0;
+    --gorgias-border: #F8D0A0;
+    --gorgias-text: #92450A;
     --mono: 'Courier New', monospace;
     --serif: 'DM Serif Display', Georgia, serif;
     --sans: 'DM Sans', system-ui, sans-serif;
@@ -71,18 +71,18 @@
       --info-bg: #0D1530;
       --info-border: #1A3080;
       --info-text: #80A8FF;
-      --tag-dcl: #0D1530;
-      --tag-dcl-border: #1A3080;
-      --tag-dcl-text: #80A8FF;
-      --tag-shopify: #0D2018;
-      --tag-shopify-border: #1A5C30;
-      --tag-shopify-text: #5ADB80;
-      --tag-stay: #1A0D28;
-      --tag-stay-border: #5A1A8A;
-      --tag-stay-text: #C080F8;
-      --tag-gorgias: #201408;
-      --tag-gorgias-border: #7A3808;
-      --tag-gorgias-text: #F8A050;
+      --dcl-bg: #0D1530;
+      --dcl-border: #1A3080;
+      --dcl-text: #80A8FF;
+      --shopify-bg: #0D2018;
+      --shopify-border: #1A5C30;
+      --shopify-text: #5ADB80;
+      --stay-bg: #1A0D28;
+      --stay-border: #5A1A8A;
+      --stay-text: #C080F8;
+      --gorgias-bg: #201408;
+      --gorgias-border: #7A3808;
+      --gorgias-text: #F8A050;
     }
   }
 
@@ -100,14 +100,7 @@
     margin-bottom: 2rem;
     padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
   }
-
-  .header-left {}
 
   .version-badge {
     display: inline-block;
@@ -132,47 +125,8 @@
     line-height: 1.2;
   }
 
-  h1 em {
-    font-style: normal;
-    color: var(--text-3);
-  }
+  h1 em { font-style: normal; color: var(--text-3); }
 
-  /* Stage progress bar */
-  .stage-track {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .stage-pip {
-    height: 3px;
-    flex: 1;
-    background: var(--border);
-    border-radius: 99px;
-    transition: background 0.3s;
-  }
-
-  .stage-pip.active { background: var(--text); }
-  .stage-pip.done { background: var(--text-3); }
-
-  .stage-label-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-
-  .stage-lbl {
-    font-size: 10px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-3);
-  }
-
-  .stage-lbl.active { color: var(--text); }
-
-  /* Card */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -234,12 +188,7 @@
 
   .btn:hover { background: var(--surface-2); border-color: var(--border-mid); }
   .btn:active { transform: scale(0.99); }
-
-  .btn-icon {
-    font-size: 15px;
-    flex-shrink: 0;
-    line-height: 1;
-  }
+  .btn-icon { font-size: 15px; flex-shrink: 0; line-height: 1; }
 
   .confirm-btn {
     background: var(--success-bg);
@@ -256,7 +205,7 @@
   }
   .confirm-btn:hover { opacity: 0.8; }
 
-  /* Info / action boxes */
+  /* Info boxes */
   .info-box {
     background: var(--surface-2);
     border-left: 2px solid var(--border-mid);
@@ -305,10 +254,10 @@
     padding: 10px 12px;
   }
 
-  .sys-dcl { background: var(--tag-dcl); border: 1px solid var(--tag-dcl-border); }
-  .sys-shopify { background: var(--tag-shopify); border: 1px solid var(--tag-shopify-border); }
-  .sys-stay { background: var(--tag-stay); border: 1px solid var(--tag-stay-border); }
-  .sys-gorgias { background: var(--tag-gorgias); border: 1px solid var(--tag-gorgias-border); }
+  .sys-dcl     { background: var(--dcl-bg);     border: 1px solid var(--dcl-border); }
+  .sys-shopify { background: var(--shopify-bg); border: 1px solid var(--shopify-border); }
+  .sys-stay    { background: var(--stay-bg);    border: 1px solid var(--stay-border); }
+  .sys-gorgias { background: var(--gorgias-bg); border: 1px solid var(--gorgias-border); }
 
   .sys-label {
     font-family: var(--mono);
@@ -319,10 +268,10 @@
     margin-bottom: 5px;
   }
 
-  .sys-dcl .sys-label { color: var(--tag-dcl-text); }
-  .sys-shopify .sys-label { color: var(--tag-shopify-text); }
-  .sys-stay .sys-label { color: var(--tag-stay-text); }
-  .sys-gorgias .sys-label { color: var(--tag-gorgias-text); }
+  .sys-dcl .sys-label     { color: var(--dcl-text); }
+  .sys-shopify .sys-label { color: var(--shopify-text); }
+  .sys-stay .sys-label    { color: var(--stay-text); }
+  .sys-gorgias .sys-label { color: var(--gorgias-text); }
 
   .sys-content {
     font-size: 12px;
@@ -330,10 +279,31 @@
     line-height: 1.5;
   }
 
-  .sys-dcl .sys-content { color: var(--tag-dcl-text); }
-  .sys-shopify .sys-content { color: var(--tag-shopify-text); }
-  .sys-stay .sys-content { color: var(--tag-stay-text); }
-  .sys-gorgias .sys-content { color: var(--tag-gorgias-text); }
+  .sys-dcl .sys-content     { color: var(--dcl-text); }
+  .sys-shopify .sys-content { color: var(--shopify-text); }
+  .sys-stay .sys-content    { color: var(--stay-text); }
+  .sys-gorgias .sys-content { color: var(--gorgias-text); }
+
+  /* Outcome — uses same system grid */
+  .outcome {
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    animation: fadeIn 0.18s ease;
+  }
+
+  .outcome-cancel  { background: var(--danger-bg);  border: 1px solid var(--danger-border); }
+  .outcome-success { background: var(--success-bg); border: 1px solid var(--success-border); }
+
+  .outcome-title {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: normal;
+    margin-bottom: 14px;
+  }
+
+  .outcome-cancel .outcome-title  { color: var(--danger-text); }
+  .outcome-success .outcome-title { color: var(--success-text); }
 
   /* Macro pill */
   .macro-pill {
@@ -355,8 +325,7 @@
   .macro-pill::before {
     content: '';
     display: inline-block;
-    width: 6px;
-    height: 6px;
+    width: 6px; height: 6px;
     border-radius: 50%;
     background: var(--border-mid);
     flex-shrink: 0;
@@ -364,66 +333,7 @@
 
   .macros-row { margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 2px; }
 
-  /* Outcome */
-  .outcome {
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    animation: fadeIn 0.18s ease;
-  }
-
-  .outcome-cancel { background: var(--danger-bg); border: 1px solid var(--danger-border); }
-  .outcome-success { background: var(--success-bg); border: 1px solid var(--success-border); }
-
-  .outcome-title {
-    font-family: var(--serif);
-    font-size: 18px;
-    font-weight: normal;
-    margin-bottom: 12px;
-  }
-
-  .outcome-cancel .outcome-title { color: var(--danger-text); }
-  .outcome-success .outcome-title { color: var(--success-text); }
-
-  .outcome-section {
-    margin-bottom: 10px;
-  }
-
-  .outcome-section-label {
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    margin-bottom: 5px;
-    opacity: 0.7;
-  }
-
-  .outcome-cancel .outcome-section-label { color: var(--danger-text); }
-  .outcome-success .outcome-section-label { color: var(--success-text); }
-
-  .outcome-steps { list-style: none; padding: 0; }
-  .outcome-steps li {
-    font-size: 13px;
-    font-weight: 300;
-    padding: 4px 0 4px 16px;
-    position: relative;
-    line-height: 1.55;
-  }
-  .outcome-steps li::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 10px;
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0.4;
-  }
-
-  .outcome-cancel .outcome-steps li { color: var(--danger-text); }
-  .outcome-success .outcome-steps li { color: var(--success-text); }
-
-  /* Save / resume */
+  /* Save box */
   .save-box {
     background: var(--surface-2);
     border: 1px solid var(--border);
@@ -460,7 +370,7 @@
     font-size: 11px;
     font-weight: 300;
     color: var(--text-3);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .save-instructions {
@@ -521,7 +431,7 @@
     display: none;
   }
 
-  /* Breadcrumb */
+  /* Breadcrumb + nav */
   .breadcrumb {
     display: flex;
     flex-wrap: wrap;
@@ -532,7 +442,13 @@
   .crumb { font-size: 11px; font-weight: 300; color: var(--text-3); }
   .crumb-sep { font-size: 11px; color: var(--border-mid); }
 
-  .restart-btn {
+  .nav-btns {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .nav-btn {
     background: none;
     border: none;
     font-family: var(--sans);
@@ -542,10 +458,8 @@
     cursor: pointer;
     text-decoration: underline;
     padding: 0;
-    margin-bottom: 1rem;
-    display: block;
   }
-  .restart-btn:hover { color: var(--text-2); }
+  .nav-btn:hover { color: var(--text-2); }
 
   .resumed-tag {
     display: inline-block;
@@ -566,10 +480,8 @@
 <body>
 <div class="shell">
   <header>
-    <div class="header-left">
-      <div class="version-badge">V3 — Updated Flow</div>
-      <h1>Win-Back Decision Tool <em>/ CX Guide</em></h1>
-    </div>
+    <div class="version-badge">V3 — Updated Flow</div>
+    <h1>Winback Decision Tool <em>/ CX Guide</em></h1>
   </header>
   <div id="app"></div>
 </div>
@@ -578,10 +490,9 @@
 const S = {
   step: 'start',
   path: [],
-  eligible: null,       // true/false
-  reason: null,         // reason key
-  orderStatus: null,    // stage10, stage20, shipped, none
-  subStatus: null,      // soon (<=7d), later (8d+)
+  reason: null,
+  orderStatus: null,
+  subStatus: null,
   resumed: false,
 };
 
@@ -598,11 +509,9 @@ const reasonConditionals = {
 
 const crumbMap = {
   start: 'Start',
-  check_eligibility: 'Eligibility',
-  order_status: 'Order status',
-  sub_status: 'Sub timing',
-  hold_order: 'Hold order',
-  push_sub: 'Push sub',
+  check_order_status: 'Order status',
+  check_sub_status: 'Sub timing',
+  action_push_sub: 'Push sub',
   reason_known: 'Reason?',
   request_reason: 'Request reason',
   request_reason_return: 'Returning',
@@ -611,7 +520,16 @@ const crumbMap = {
   stage2_offer: 'Send offer',
   stage2_offer_return: 'Returning',
   stage2_checkin: 'Check-in',
+  stage2_checkin_return: 'Returning',
   stage3_response: 'Customer response',
+  outcome_accepted: 'Winback accepted',
+  outcome_rejected: 'Winback rejected',
+  cancel_no_reply: 'No reply',
+  cancel_no_reply_offer: 'No reply',
+  ineligible_onetime: 'Ineligible',
+  ineligible_orderonly: 'Ineligible',
+  ineligible_direct: 'Ineligible',
+  ineligible_tagged: 'Ineligible',
 };
 
 function crumb(s) { return crumbMap[s] || s; }
@@ -646,8 +564,15 @@ function go(next, key, val) {
   render();
 }
 
+function goBack() {
+  if (!S.path.length) return;
+  S.step = S.path.pop();
+  S.resumed = false;
+  render();
+}
+
 function restart() {
-  Object.assign(S, { step: 'start', path: [], eligible: null, reason: null, orderStatus: null, subStatus: null, resumed: false });
+  Object.assign(S, { step: 'start', path: [], reason: null, orderStatus: null, subStatus: null, resumed: false });
   render();
 }
 
@@ -664,25 +589,33 @@ function tryResume() {
 }
 
 function copyCode(code) {
-  navigator.clipboard.writeText('Win-back resume code: ' + code).then(() => {
+  navigator.clipboard.writeText('Winback resume code: ' + code).then(() => {
     const btn = document.getElementById('cb-' + code);
     if (btn) { btn.textContent = 'Copied!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = 'Copy to clipboard'; btn.classList.remove('copied'); }, 2000); }
   });
 }
 
 // ── Helpers ──────────────────────────────────────────────────
+function navBtns() {
+  if (!S.path.length) return '';
+  let h = '<div class="nav-btns">';
+  h += '<button class="nav-btn" onclick="goBack()">← Back</button>';
+  h += '<button class="nav-btn" onclick="restart()">↺ Start over</button>';
+  h += '</div>';
+  return h;
+}
+
 function bc() {
   if (!S.path.length) return '';
   let h = '<div class="breadcrumb">';
   S.path.forEach(p => { h += `<span class="crumb">${crumb(p)}</span><span class="crumb-sep"> › </span>`; });
   h += `<span class="crumb" style="color:var(--text)">${crumb(S.step)}</span></div>`;
-  h += '<button class="restart-btn" onclick="restart()">← Start over</button>';
   return h;
 }
 
 function card(stage, question, sub, body) {
   const rt = S.resumed ? '<span class="resumed-tag">Resumed from snooze</span><br>' : '';
-  return `${bc()}<div class="card">${rt}${stage ? `<div class="card-stage">${stage}</div>` : ''}<div class="question">${question}</div>${sub ? `<div class="sub">${sub}</div>` : ''}${body}</div>`;
+  return `${bc()}${navBtns()}<div class="card">${rt}${stage ? `<div class="card-stage">${stage}</div>` : ''}<div class="question">${question}</div>${sub ? `<div class="sub">${sub}</div>` : ''}${body}</div>`;
 }
 
 function btns(choices) {
@@ -706,38 +639,45 @@ function sysGrid(dcl, shopify, stay, gorgias) {
 
 function saveBox(snoozePoint) {
   const code = encodeState(snoozePoint);
-  const labels = { request_reason: 'Waiting for cancellation reason', winback_offered: 'Win-back offer sent — waiting for reply', winback_checkin: 'Check-in sent — waiting for reply' };
+  const labels = {
+    request_reason: 'Waiting for cancellation reason',
+    winback_offered: 'Winback offer sent — waiting for reply',
+    winback_checkin: 'Check-in sent — waiting for reply'
+  };
   return `<div class="save-box">
     <div class="save-box-title">Save this code in Gorgias before you snooze</div>
     <span class="save-code">${code}</span>
     <div class="save-sublabel">${labels[snoozePoint] || ''}</div>
-    <div class="save-instructions">1. Click <strong>Copy to clipboard</strong> below &nbsp;·&nbsp; 2. In Gorgias, open the ticket → click <strong>Add note</strong> → paste → submit &nbsp;·&nbsp; 3. Then snooze the ticket as normal.</div>
+    <div class="save-instructions">Click <strong>Copy to clipboard</strong>, then add to an internal note in Gorgias.</div>
     <button class="copy-btn" id="cb-${code}" onclick="copyCode('${code}')">Copy to clipboard</button>
   </div>`;
 }
 
-function outcome(type, title, sections, tip) {
+function outcomeCard(type, title, gridSections, tip) {
   const cls = type === 'success' ? 'outcome-success' : 'outcome-cancel';
-  let h = `${bc()}<div class="outcome ${cls}"><div class="outcome-title">${title}</div>`;
-  sections.forEach(([label, items]) => {
-    h += `<div class="outcome-section"><div class="outcome-section-label">${label}</div><ul class="outcome-steps">`;
-    items.forEach(i => { h += `<li>${i}</li>`; });
-    h += '</ul></div>';
+  let h = `${bc()}${navBtns()}<div class="outcome ${cls}"><div class="outcome-title">${title}</div>`;
+  // Render as system grid with colored cards, two per row
+  h += '<div class="system-grid">';
+  gridSections.forEach(([sys, items]) => {
+    const sysClass = { DCL: 'sys-dcl', Shopify: 'sys-shopify', Stay: 'sys-stay', Gorgias: 'sys-gorgias', Note: 'sys-gorgias' }[sys] || 'sys-dcl';
+    const filtered = items.filter(Boolean);
+    h += `<div class="system-card ${sysClass}"><div class="sys-label">${sys}</div><div class="sys-content">`;
+    if (filtered.length === 1) {
+      h += filtered[0];
+    } else {
+      h += '<ul style="list-style:none;padding:0;margin:0">';
+      filtered.forEach(i => { h += `<li style="padding:3px 0 3px 12px;position:relative;"><span style="position:absolute;left:0;top:8px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.5;display:inline-block"></span>${i}</li>`; });
+      h += '</ul>';
+    }
+    h += '</div></div>';
   });
-  if (tip) h += `<div class="tip-box" style="margin-top:10px">${tip}</div>`;
-  h += '</div><button class="restart-btn" onclick="restart()">← Start a new cancellation</button>';
+  h += '</div>';
+  if (tip) h += `<div class="tip-box" style="margin-top:4px">${tip}</div>`;
+  h += '</div>';
   return h;
 }
 
 // ── DCL helpers ──────────────────────────────────────────────
-function dclHoldText() {
-  if (!S.orderStatus || S.orderStatus === 'none') return 'No unfulfilled order — no action needed';
-  if (S.orderStatus === 'stage10') return 'Stage 10 — put on hold: "Hold for customer reply — XX"';
-  if (S.orderStatus === 'stage20') return 'Stage 20 — put on hold: "Hold for customer reply — XX"';
-  if (S.orderStatus === 'shipped') return 'Stage 40/60 — already shipped, follow Can\'t Cancel process';
-  return 'Check order status';
-}
-
 function dclCancelText() {
   if (!S.orderStatus || S.orderStatus === 'none') return 'No unfulfilled order — no action needed';
   if (S.orderStatus === 'stage10') return 'Stage 10 — cancel the order directly';
@@ -746,16 +686,9 @@ function dclCancelText() {
   return '';
 }
 
-function dclReleaseText() {
-  if (!S.orderStatus || S.orderStatus === 'none') return 'No unfulfilled order — no action needed';
-  if (S.orderStatus === 'stage10' || S.orderStatus === 'stage20') return 'Stage 10/20 — remove hold note and release the order';
-  if (S.orderStatus === 'shipped') return 'Stage 40/60 — no action needed';
-  return '';
-}
-
 function shopifyCancelText() {
   if (!S.orderStatus || S.orderStatus === 'none') return 'No unfulfilled order — no action needed';
-  return 'Wait for DCL cancellation, then cancel and refund the order in Shopify';
+  return 'Wait for DCL cancellation, then cancel and refund in Shopify';
 }
 
 // ── Render ───────────────────────────────────────────────────
@@ -763,21 +696,20 @@ function render() {
   const s = S.step;
   let html = '';
 
-  // ── Start ────────────────────────────────────────────────
   if (s === 'start') {
     html = `<div class="card">
       <div class="card-stage">Stage 1 — Eligibility check</div>
       <div class="question">What is the customer requesting?</div>
-      <div class="sub">Review the ticket carefully before selecting. Check their Shopify profile for an existing win-back tag.</div>
+      <div class="sub">Review the ticket carefully before selecting. Check their Shopify profile for an existing winback tag.</div>
       ${btns([
-        ['✅', 'Cancel an active subscription (with or without an unfulfilled order)', "go('check_order_status','eligible',true)"],
-        ['✅', 'Cancel an unfulfilled order AND an active subscription', "go('check_order_status','eligible',true)"],
+        ['✅', 'Cancel an active subscription (with or without an unfulfilled order)', "go('check_order_status')"],
+        ['✅', 'Cancel an unfulfilled order AND an active subscription', "go('check_order_status')"],
         ['❌', 'Cancel a one-time order only (no subscription)', "go('ineligible_onetime')"],
         ['❌', 'Cancel an order only — has an active subscription but only wants to cancel the order', "go('ineligible_orderonly')"],
         ['❌', 'Upset / complaint', "go('ineligible_direct')"],
         ['❌', 'Taste or medical reaction / reason', "go('ineligible_direct')"],
         ['❌', "Can't afford it / was overdrafted (has active sub + unfulfilled order)", "go('ineligible_direct')"],
-        ['❌', 'Already has a win-back tag on Shopify profile', "go('ineligible_tagged')"],
+        ['❌', 'Already has a winback tag on Shopify profile', "go('ineligible_tagged')"],
       ])}
       <div class="divider"><div class="divider-line"></div><div class="divider-text">returning from a snooze?</div><div class="divider-line"></div></div>
       <div class="sub" style="margin-bottom:8px">Enter the code saved in your Gorgias internal note to pick up where you left off.</div>
@@ -786,7 +718,6 @@ function render() {
       <button class="btn" onclick="tryResume()"><span class="btn-icon">↩</span><span>Resume from code</span></button>
     </div>`;
 
-  // ── Order status ─────────────────────────────────────────
   } else if (s === 'check_order_status') {
     html = card('Stage 1 — Order status', 'What is the current order status in DCL?', null,
       btns([
@@ -796,7 +727,6 @@ function render() {
         ['—', 'No unfulfilled order', "go('check_sub_status','orderStatus','none')"],
       ]));
 
-  // ── Sub timing ───────────────────────────────────────────
   } else if (s === 'check_sub_status') {
     html = card('Stage 1 — Subscription timing', "When is the customer's next subscription order due?", null,
       btns([
@@ -804,7 +734,6 @@ function render() {
         ['✓', '8 or more days from today', "go('reason_known','subStatus','later')"],
       ]));
 
-  // ── Push sub ─────────────────────────────────────────────
   } else if (s === 'action_push_sub') {
     const body = `<div class="action-box"><strong>In Stay.ai:</strong> Move the next order date to <strong>8 days from today</strong> before continuing.</div>` +
       sysGrid('No action yet', 'No action yet', 'Move next order to 8 days out', 'Complete internal note') +
@@ -812,26 +741,27 @@ function render() {
       `<button class="confirm-btn" onclick="go('reason_known','subStatus','soon')">✓ Done — date has been moved</button>`;
     html = card('Stage 1 — Action required', 'Move the next subscription order date in Stay.ai.', null, body);
 
-  // ── Reason known? ────────────────────────────────────────
   } else if (s === 'reason_known') {
-    // Also handle hold order action if needed
     const needsHold = S.orderStatus === 'stage10' || S.orderStatus === 'stage20';
-    const holdNote = needsHold ? `<div class="action-box"><strong>In DCL:</strong> Put the order on hold with the note: <strong>"Hold for customer reply — [your initials]"</strong> before continuing.</div>${macros('WINBACK - TRIAGE NOTES [Internal]')}` : '';
-    html = card('Stage 1 — Cancellation reason', 'Has the customer given you their reason for cancelling?',
-      needsHold ? null : null,
+    const holdNote = needsHold
+      ? `<div class="action-box"><strong>In DCL:</strong> Put the order on hold with the note: <strong>"Hold for customer reply — [your initials]"</strong> before continuing.</div>${macros('WINBACK - TRIAGE NOTES [Internal]')}`
+      : '';
+    html = card('Stage 1 — Cancellation reason', 'Has the customer given you their reason for cancelling?', null,
       holdNote + btns([
         ['✅', 'Yes — I have their reason', "go('select_reason')"],
         ['❓', 'No — reason not yet given', "go('request_reason')"],
       ]));
 
-  // ── Request reason ───────────────────────────────────────
   } else if (s === 'request_reason') {
     const shipped = S.orderStatus === 'shipped';
     const body =
       `<div class="tip-box">💡 Always draft your reply to the customer before taking action in Shopify or Stay.</div>` +
       `<div class="info-box">Send the <strong>WINBACK - REASON NEEDED</strong> macro.${shipped ? ' Include the <strong>WINBACK - CAN\'T CANCEL ORDER - [ADD ON]</strong> conditional — their order has already shipped.' : ''} Then snooze for <strong>2 days</strong>.</div>` +
       sysGrid(
-        S.orderStatus === 'stage10' ? 'Stage 10 — on hold for reply' : S.orderStatus === 'stage20' ? 'Stage 20 — on hold for reply' : S.orderStatus === 'shipped' ? 'Stage 40/60 — Can\'t Cancel process' : 'No action needed',
+        S.orderStatus === 'stage10' ? 'Stage 10 — on hold for reply'
+          : S.orderStatus === 'stage20' ? 'Stage 20 — on hold for reply'
+          : S.orderStatus === 'shipped' ? 'Stage 40/60 — Can\'t Cancel process'
+          : 'No action needed',
         'No action yet',
         'No action yet',
         'Send reason needed macro, complete internal note, snooze 2 days'
@@ -862,7 +792,6 @@ function render() {
       ]);
     html = card('Stage 1 — No reply check-in', 'Send a check-in and snooze 2 more days.', null, body);
 
-  // ── Select reason ────────────────────────────────────────
   } else if (s === 'select_reason') {
     html = card('Stage 1 → Stage 2', "Select the customer's cancellation reason:", null,
       btns([
@@ -876,18 +805,18 @@ function render() {
         ['⭐', 'Bad reviews', "go('stage2_offer','reason','bad_reviews')"],
       ]));
 
-  // ── Stage 2: Send offer ──────────────────────────────────
   } else if (s === 'stage2_offer' || s === 'stage2_offer_return') {
     const conditional = reasonConditionals[S.reason] || '';
     const shipped = S.orderStatus === 'shipped';
     const isReturn = s === 'stage2_offer_return';
-
     const body =
       `<div class="tip-box">💡 Always draft your reply to the customer before taking action in Shopify or Stay.</div>` +
       (isReturn ? '' :
-        `<div class="info-box">Reply using the <strong>WINBACK - OFFER</strong> macro, selecting the <strong>"${conditional}"</strong> conditional.${shipped ? ' Include the <strong>WINBACK - CAN\'T CANCEL ORDER - [ADD ON]</strong> conditional.' : ''}<br><br>Use the appropriate offer conditional based on whether there is an unfulfilled order or not. Then snooze for <strong>2 days</strong>.</div>` +
+        `<div class="info-box">Reply using the <strong>WINBACK - OFFER</strong> macro, selecting the <strong>"${conditional}"</strong> conditional.${shipped ? ' Include the <strong>WINBACK - CAN\'T CANCEL ORDER - [ADD ON]</strong> conditional.' : ''} Use the appropriate offer conditional based on whether there is an unfulfilled order or not. Then snooze for <strong>2 days</strong>.</div>` +
         sysGrid(
-          S.orderStatus === 'stage10' || S.orderStatus === 'stage20' ? 'Remains on hold for customer reply' : S.orderStatus === 'shipped' ? 'Stage 40/60 — Can\'t Cancel process' : 'No action needed',
+          S.orderStatus === 'stage10' || S.orderStatus === 'stage20' ? 'Remains on hold for customer reply'
+            : S.orderStatus === 'shipped' ? 'Stage 40/60 — Can\'t Cancel process'
+            : 'No action needed',
           'Tag profile: <strong>winback-offered</strong> (auto-applies via macro)',
           'No action yet',
           'Send offer macro, complete internal note, snooze 2 days'
@@ -899,13 +828,11 @@ function render() {
         ['💬', 'Customer replied', "go('stage3_response')"],
         ['😶', 'No reply after 2 days', "go('stage2_checkin')"],
       ]);
-
     html = card(
-      isReturn ? 'Stage 2 — Returning from snooze' : 'Stage 2 — Win-back offer',
-      isReturn ? 'Did the customer reply to the win-back offer?' : `Send the win-back offer — reason: ${conditional}`,
+      isReturn ? 'Stage 2 — Returning from snooze' : 'Stage 2 — Winback offer',
+      isReturn ? 'Did the customer reply to the winback offer?' : `Send the winback offer — reason: ${conditional}`,
       null, body);
 
-  // ── Stage 2: Check-in ────────────────────────────────────
   } else if (s === 'stage2_checkin' || s === 'stage2_checkin_return') {
     const body =
       `<div class="info-box">Send the <strong>WINBACK - CHECK-IN</strong> macro using the <strong>"CHECK-IN AFTER WINBACK OFFER"</strong> conditional. Snooze for <strong>2 more days</strong>. This is the final snooze.</div>` +
@@ -917,26 +844,25 @@ function render() {
       ]);
     html = card('Stage 2 — No reply check-in', 'Send a check-in. This is the final attempt.', null, body);
 
-  // ── Stage 3: Customer response ───────────────────────────
   } else if (s === 'stage3_response') {
-    html = card('Stage 3 — Customer response', 'Did the customer accept the win-back offer?', null,
+    html = card('Stage 3 — Customer response', 'Did the customer accept the winback offer?', null,
       btns([
         ['🎉', 'Yes — they accepted', "go('outcome_accepted')"],
         ['❌', 'No — they declined', "go('outcome_rejected')"],
       ]));
 
-  // ── Outcome: Accepted ────────────────────────────────────
   } else if (s === 'outcome_accepted') {
     const shipped = S.orderStatus === 'shipped';
     const hasOrder = S.orderStatus && S.orderStatus !== 'none';
-    html = outcome('success', 'Win-back accepted', [
+    html = outcomeCard('success', 'Winback accepted', [
       ['DCL', [
-        shipped || !hasOrder ? 'No action needed' :
-          S.orderStatus === 'stage10' || S.orderStatus === 'stage20' ? 'Remove hold note and release the order (unless customer also requested order cancellation)' : 'No action needed',
+        shipped || !hasOrder
+          ? 'No action needed'
+          : 'Remove hold note and release the order (unless customer also requested order cancellation)',
       ]],
       ['Shopify', [
         'Tag profile: winback-accepted (auto-applies via macro)',
-        shipped ? 'Refund the order as initiated' : hasOrder ? 'No Shopify action needed — order releasing via DCL' : 'No action needed',
+        shipped ? 'Refund the order as initiated' : hasOrder ? 'No action needed — order releasing via DCL' : 'No action needed',
       ]],
       ['Stay', ['Apply discount code CXSUBSAVE40 to the customer\'s subscription']],
       ['Gorgias', [
@@ -944,113 +870,77 @@ function render() {
         shipped ? 'Include WINBACK - CAN\'T CANCEL ORDER - [ADD ON] conditional' : '',
         'Complete WINBACK - PROGRESS NOTES [Internal] — confirm tags, contact reason, and resolution are correct',
         'Close the ticket',
-      ].filter(Boolean)],
+      ]],
     ], '💡 Always draft your reply before taking action in Shopify or Stay.');
 
-  // ── Outcome: Rejected ────────────────────────────────────
   } else if (s === 'outcome_rejected') {
     const shipped = S.orderStatus === 'shipped';
-    html = outcome('cancel', 'Win-back rejected — proceed to cancellation', [
+    html = outcomeCard('cancel', 'Winback rejected — proceed to cancellation', [
       ['DCL', [
-        S.orderStatus === 'stage10' ? 'Stage 10 — cancel the order' :
-        S.orderStatus === 'stage20' ? 'Stage 20 — edit hold note to "Please cancel — XX", wait for DCL to action' :
-        S.orderStatus === 'shipped' ? 'Stage 40/60 — no DCL action needed' :
-        'No unfulfilled order — no action needed',
+        S.orderStatus === 'stage10' ? 'Stage 10 — cancel the order'
+          : S.orderStatus === 'stage20' ? 'Stage 20 — edit hold note to "Please cancel — XX", wait for DCL to action'
+          : S.orderStatus === 'shipped' ? 'Stage 40/60 — no DCL action needed'
+          : 'No unfulfilled order — no action needed',
       ]],
       ['Shopify', [
         'Tag profile: winback-rejected (auto-applies via macro)',
         shipped ? 'Refund the order in Shopify' : S.orderStatus !== 'none' ? 'Wait for DCL cancellation, then cancel and refund in Shopify' : 'No action needed',
       ]],
-      ['Stay', ['Cancel the subscription in Stay via the Gorgias widget or Stay Dashboard']],
+      ['Stay', ['Cancel the subscription via the Gorgias widget or Stay Dashboard']],
       ['Gorgias', [
         'Reply using the WINBACK - REJECTED macro with the correct conditionals',
         shipped ? 'Include WINBACK - CAN\'T CANCEL ORDER - [ADD ON] conditional' : '',
         'Complete WINBACK - PROGRESS NOTES [Internal] — confirm tags, contact reason, and resolution are correct',
         'Close the ticket',
-      ].filter(Boolean)],
+      ]],
     ], '💡 Always draft your reply before taking action in Shopify or Stay.');
 
-  // ── Outcome: No reply (after reason request) ─────────────
-  } else if (s === 'cancel_no_reply') {
+  } else if (s === 'cancel_no_reply' || s === 'cancel_no_reply_offer') {
     const shipped = S.orderStatus === 'shipped';
-    html = outcome('cancel', 'No reply — proceed to cancellation', [
+    const label = s === 'cancel_no_reply' ? 'No reply — proceed to cancellation' : 'No reply to offer — proceed to cancellation';
+    html = outcomeCard('cancel', label, [
       ['DCL', [dclCancelText()]],
       ['Shopify', [shopifyCancelText()]],
-      ['Stay', ['Cancel the subscription in Stay via the Gorgias widget or Stay Dashboard']],
+      ['Stay', ['Cancel the subscription via the Gorgias widget or Stay Dashboard']],
       ['Gorgias', [
         'Reply using the WINBACK - REJECTED macro, selecting the "NO REPLY" conditional',
         shipped ? 'Include WINBACK - CAN\'T CANCEL ORDER - [ADD ON] conditional' : '',
         'Complete WINBACK - PROGRESS NOTES [Internal] — confirm tags, contact reason, and resolution are correct',
         'Close the ticket',
-      ].filter(Boolean)],
+      ]],
     ], '💡 Always draft your reply before taking action in Shopify or Stay.');
 
-  // ── Outcome: No reply (after offer) ──────────────────────
-  } else if (s === 'cancel_no_reply_offer') {
-    const shipped = S.orderStatus === 'shipped';
-    html = outcome('cancel', 'No reply to offer — proceed to cancellation', [
-      ['DCL', [dclCancelText()]],
-      ['Shopify', [shopifyCancelText()]],
-      ['Stay', ['Cancel the subscription in Stay via the Gorgias widget or Stay Dashboard']],
-      ['Gorgias', [
-        'Reply using the WINBACK - REJECTED macro, selecting the "NO REPLY" conditional',
-        shipped ? 'Include WINBACK - CAN\'T CANCEL ORDER - [ADD ON] conditional' : '',
-        'Complete WINBACK - PROGRESS NOTES [Internal] — confirm tags, contact reason, and resolution are correct',
-        'Close the ticket',
-      ].filter(Boolean)],
-    ], '💡 Always draft your reply before taking action in Shopify or Stay.');
-
-  // ── Ineligible: one-time order ───────────────────────────
   } else if (s === 'ineligible_onetime') {
-    html = outcome('cancel', 'No win-back — one-time order cancellation', [
+    html = outcomeCard('cancel', 'No winback — one-time order cancellation', [
       ['DCL', ['Stage 10 — cancel the order', 'Stage 20 — put on hold: "Please cancel — XX"', 'Stage 40/60 — follow the Can\'t Cancel process', 'No unfulfilled order — no action needed']],
-      ['Shopify', ['Wait for DCL cancellation, then cancel and refund the order in Shopify', 'No unfulfilled order — no action needed']],
+      ['Shopify', ['Wait for DCL cancellation, then cancel and refund in Shopify', 'No unfulfilled order — no action needed']],
       ['Stay', ['No subscription to address — no action needed']],
-      ['Gorgias', [
-        'Complete WINBACK - TRIAGE NOTES [Internal] — mark as NOT eligible, note reason',
-        'Reply using the CANCEL ORDER macro with the correct conditionals',
-        'Close the ticket',
-      ]],
+      ['Gorgias', ['Complete WINBACK - TRIAGE NOTES [Internal] — mark as NOT eligible, note reason', 'Reply using the CANCEL ORDER macro with the correct conditionals', 'Close the ticket']],
     ], '💡 Always draft your reply before taking action in Shopify or Stay.');
 
-  // ── Ineligible: order only (has sub) ─────────────────────
   } else if (s === 'ineligible_orderonly') {
-    html = outcome('cancel', 'No win-back — order cancellation only', [
+    html = outcomeCard('cancel', 'No winback — order cancellation only', [
       ['DCL', ['Stage 10 — cancel the order', 'Stage 20 — put on hold: "Please cancel — XX"', 'Stage 40/60 — follow the Can\'t Cancel process', 'No unfulfilled order — no action needed']],
-      ['Shopify', ['Wait for DCL cancellation, then cancel and refund the order in Shopify', 'No unfulfilled order — no action needed']],
+      ['Shopify', ['Wait for DCL cancellation, then cancel and refund in Shopify', 'No unfulfilled order — no action needed']],
       ['Stay', ['Customer wants to keep their subscription — no action needed']],
-      ['Gorgias', [
-        'Complete WINBACK - TRIAGE NOTES [Internal] — mark as NOT eligible, note reason',
-        'Reply using the CANCEL ORDER macro with the correct conditionals',
-        'Close the ticket',
-      ]],
+      ['Gorgias', ['Complete WINBACK - TRIAGE NOTES [Internal] — mark as NOT eligible, note reason', 'Reply using the CANCEL ORDER macro with the correct conditionals', 'Close the ticket']],
     ], '💡 Always draft your reply before taking action in Shopify or Stay.');
 
-  // ── Ineligible: direct cancel (upset/taste/medical/afford) ─
   } else if (s === 'ineligible_direct') {
-    html = outcome('cancel', 'No win-back — proceed to cancellation', [
+    html = outcomeCard('cancel', 'No winback — proceed to cancellation', [
       ['DCL', ['Stage 10 — cancel the order', 'Stage 20 — put on hold: "Please cancel — XX"', 'Stage 40/60 — follow the Can\'t Cancel process', 'No unfulfilled order — no action needed']],
-      ['Shopify', ['Wait for DCL cancellation, then cancel and refund the order in Shopify', 'No unfulfilled order — no action needed']],
-      ['Stay', ['Cancel the subscription in Stay via the Gorgias widget or Stay Dashboard']],
-      ['Gorgias', [
-        'Complete WINBACK - TRIAGE NOTES [Internal] — mark as NOT eligible, note reason',
-        'Reply using the CANCEL ORDER macro with the correct conditionals',
-        'Close the ticket',
-      ]],
+      ['Shopify', ['Wait for DCL cancellation, then cancel and refund in Shopify', 'No unfulfilled order — no action needed']],
+      ['Stay', ['Cancel the subscription via the Gorgias widget or Stay Dashboard']],
+      ['Gorgias', ['Complete WINBACK - TRIAGE NOTES [Internal] — mark as NOT eligible, note reason', 'Reply using the CANCEL ORDER macro with the correct conditionals', 'Close the ticket']],
     ], '💡 Always draft your reply before taking action in Shopify or Stay.');
 
-  // ── Ineligible: already tagged ───────────────────────────
   } else if (s === 'ineligible_tagged') {
-    html = outcome('cancel', 'No win-back — already tagged in Shopify', [
-      ['Note', ['This customer has already gone through the win-back flow (winback-offered tag exists on their Shopify profile).', 'Proceed directly to cancellation — do not attempt another win-back.']],
+    html = outcomeCard('cancel', 'No winback — already tagged in Shopify', [
+      ['Note', ['This customer has already gone through the winback flow. A winback tag exists on their Shopify profile. Do not attempt another winback.']],
       ['DCL', ['Stage 10 — cancel the order', 'Stage 20 — put on hold: "Please cancel — XX"', 'Stage 40/60 — follow the Can\'t Cancel process', 'No unfulfilled order — no action needed']],
-      ['Shopify', ['Wait for DCL cancellation, then cancel and refund the order in Shopify', 'No unfulfilled order — no action needed']],
-      ['Stay', ['Cancel the subscription in Stay via the Gorgias widget or Stay Dashboard']],
-      ['Gorgias', [
-        'Complete WINBACK - TRIAGE NOTES [Internal] — mark as NOT eligible, note reason',
-        'Reply using the CANCEL ORDER macro with the correct conditionals',
-        'Close the ticket',
-      ]],
+      ['Shopify', ['Wait for DCL cancellation, then cancel and refund in Shopify', 'No unfulfilled order — no action needed']],
+      ['Stay', ['Cancel the subscription via the Gorgias widget or Stay Dashboard']],
+      ['Gorgias', ['Complete WINBACK - TRIAGE NOTES [Internal] — mark as NOT eligible, note reason', 'Reply using the CANCEL ORDER macro with the correct conditionals', 'Close the ticket']],
     ], '💡 Always draft your reply before taking action in Shopify or Stay.');
   }
 
