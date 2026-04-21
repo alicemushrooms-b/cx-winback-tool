@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winback Decision Tool — V3</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface-2: #F0EDE6;
+    --border: #E2DDD4;
+    --border-mid: #C8C2B4;
+    --text: #1C1A15;
+    --text-2: #6B6456;
+    --text-3: #A89F92;
+    --danger-bg: #FEF2F0;
+    --danger-border: #F5C4BC;
+    --danger-text: #B83A2A;
+    --success-bg: #F0F8F2;
+    --success-border: #A8D9B4;
+    --success-text: #1A6B35;
+    --warn-bg: #FEFBF0;
+    --warn-border: #F0D878;
+    --warn-text: #7A5C08;
+    --info-bg: #F0F4FE;
+    --info-border: #B8CEFA;
+    --info-text: #1A3EB8;
+    /* System colors — matched to screenshots */
+    --dcl-bg: #EEF4FF;
+    --dcl-border: #C0D4FF;
+    --dcl-text: #1E40AF;
+    --shopify-bg: #F0FDF4;
+    --shopify-border: #A0DFBA;
+    --shopify-text: #14663A;
+    --stay-bg: #FDF4FF;
+    --stay-border: #DDB8F8;
+    --stay-text: #6B21A8;
+    --gorgias-bg: #FFF8F0;
+    --gorgias-border: #F8D0A0;
+    --gorgias-text: #92450A;
+    --mono: 'Courier New', monospace;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141210;
+      --surface: #1E1C18;
+      --surface-2: #252220;
+      --border: #2E2A24;
+      --border-mid: #3E3A32;
+      --text: #F0EDE6;
+      --text-2: #A89F90;
+      --text-3: #6B6456;
+      --danger-bg: #2A1510;
+      --danger-border: #7A2818;
+      --danger-text: #F4806A;
+      --success-bg: #0D2018;
+      --success-border: #1A5C30;
+      --success-text: #5ADB80;
+      --warn-bg: #1E1800;
+      --warn-border: #7A5C08;
+      --warn-text: #F0C040;
+      --info-bg: #0D1530;
+      --info-border: #1A3080;
+      --info-text: #80A8FF;
+      --dcl-bg: #0D1530;
+      --dcl-border: #1A3080;
+      --dcl-text: #80A8FF;
+      --shopify-bg: #0D2018;
+      --shopify-border: #1A5C30;
+      --shopify-text: #5ADB80;
+      --stay-bg: #1A0D28;
+      --stay-border: #5A1A8A;
+      --stay-text: #C080F8;
+      --gorgias-bg: #201408;
+      --gorgias-border: #7A3808;
+      --gorgias-text: #F8A050;
+    }
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .shell { max-width: 660px; margin: 0 auto; }
+
+  header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .version-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: normal;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  h1 em { font-style: normal; color: var(--text-3); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    animation: fadeIn 0.18s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card-stage {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 8px;
+  }
+
+  .question {
+    font-family: var(--serif);
+    font-size: 19px;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .sub {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-2);
+    margin-bottom: 1.25rem;
+    line-height: 1.65;
+  }
+
+  /* Buttons */
+  .btn-group { display: flex; flex-direction: column; gap: 7px; }
+
+  .btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px 16px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    line-height: 1.4;
+    width: 100%;
+    transition: border-color 0.12s, background 0.12s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn:hover { background: var(--surface-2); border-color: var(--border-mid); }
+  .btn:active { transform: scale(0.99); }
+  .btn-icon { font-size: 15px; flex-shrink: 0; line-height: 1; }
+
+  .confirm-btn {
+    background: var(--success-bg);
+    border: 1px solid var(--success-border);
+    border-radius: var(--radius-sm);
+    padding: 11px 16px;
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--success-text);
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    transition: opacity 0.12s;
+  }
+  .confirm-btn:hover { opacity: 0.8; }
+
+  /* Info boxes */
+  .info-box {
+    background: var(--surface-2);
+    border-left: 2px solid var(--border-mid);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    margin-bottom: 1rem;
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-2);
+    line-height: 1.65;
+  }
+
+  .action-box {
+    background: var(--warn-bg);
+    border-left: 2px solid var(--warn-border);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    margin-bottom: 1rem;
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--warn-text);
+    line-height: 1.65;
+  }
+
+  .tip-box {
+    background: var(--info-bg);
+    border-left: 2px solid var(--info-border);
+    border-radius: var(--radius-sm);
+    padding: 9px 14px;
+    margin-bottom: 1rem;
+    font-size: 12px;
+    color: var(--info-text);
+    line-height: 1.6;
+  }
+
+  /* System action grid */
+  .system-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .system-card {
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+  }
+
+  .sys-dcl     { background: var(--dcl-bg);     border: 1px solid var(--dcl-border); }
+  .sys-shopify { background: var(--shopify-bg); border: 1px solid var(--shopify-border); }
+  .sys-stay    { background: var(--stay-bg);    border: 1px solid var(--stay-border); }
+  .sys-gorgias { background: var(--gorgias-bg); border: 1px solid var(--gorgias-border); }
+
+  .sys-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 5px;
+  }
+
+  .sys-dcl .sys-label     { color: var(--dcl-text); }
+  .sys-shopify .sys-label { color: var(--shopify-text); }
+  .sys-stay .sys-label    { color: var(--stay-text); }
+  .sys-gorgias .sys-label { color: var(--gorgias-text); }
+
+  .sys-content {
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .sys-dcl .sys-content     { color: var(--dcl-text); }
+  .sys-shopify .sys-content { color: var(--shopify-text); }
+  .sys-stay .sys-content    { color: var(--stay-text); }
+  .sys-gorgias .sys-content { color: var(--gorgias-text); }
+
+  /* Outcome — uses same system grid */
+  .outcome {
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    animation: fadeIn 0.18s ease;
+  }
+
+  .outcome-cancel  { background: var(--danger-bg);  border: 1px solid var(--danger-border); }
+  .outcome-success { background: var(--success-bg); border: 1px solid var(--success-border); }
+
+  .outcome-title {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: normal;
+    margin-bottom: 14px;
+  }
+
+  .outcome-cancel .outcome-title  { color: var(--danger-text); }
+  .outcome-success .outcome-title { color: var(--success-text); }
+
+  /* Macro pill */
+  .macro-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 10px 3px 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-2);
+    letter-spacing: 0.03em;
+    margin: 2px 3px 2px 0;
+  }
+
+  .macro-pill::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border-mid);
+    flex-shrink: 0;
+  }
+
+  .macros-row { margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 2px; }
+
+  /* Save box */
+  .save-box {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .save-box-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 10px;
+  }
+
+  .save-code {
+    display: block;
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.22em;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 6px;
+  }
+
+  .save-sublabel {
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--text-3);
+    margin-bottom: 8px;
+  }
+
+  .save-instructions {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--text-2);
+    margin-bottom: 10px;
+    line-height: 1.6;
+  }
+
+  .copy-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 7px 14px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .copy-btn:hover { background: var(--bg); }
+  .copy-btn.copied { color: var(--success-text); border-color: var(--success-border); }
+
+  /* Resume */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .divider-line { flex: 1; height: 1px; background: var(--border); }
+  .divider-text { font-size: 11px; font-weight: 300; color: var(--text-3); white-space: nowrap; }
+
+  .resume-input {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    margin-bottom: 8px;
+    outline: none;
+    transition: border-color 0.12s;
+  }
+  .resume-input:focus { border-color: var(--border-mid); }
+  .resume-input.error { border-color: var(--danger-border); }
+
+  .error-msg {
+    font-size: 12px;
+    color: var(--danger-text);
+    margin-bottom: 8px;
+    display: none;
+  }
+
+  /* Breadcrumb + nav */
+  .breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  .crumb { font-size: 11px; font-weight: 300; color: var(--text-3); }
+  .crumb-sep { font-size: 11px; color: var(--border-mid); }
+
+  .nav-btns {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .nav-btn {
+    background: none;
+    border: none;
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--text-3);
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+  }
+  .nav-btn:hover { color: var(--text-2); }
+
+  .resumed-tag {
+    display: inline-block;
+    background: var(--info-bg);
+    border: 1px solid var(--info-border);
+    border-radius: 5px;
+    padding: 2px 10px;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--info-text);
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="version-badge">V3 — Updated Flow</div>
+    <h1>Winback Decision Tool <em>/ CX Guide</em></h1>
+  </header>
+  <div id="app"></div>
+</div>
+
+<script>
+const S = {
+  step: 'start',
+  path: [],
+  reason: null,
+  orderStatus: null,
+  subStatus: null,
+  resumed: false,
+};
+
+const reasonConditionals = {
+  too_expensive: 'TOO EXPENSIVE',
+  buy_elsewhere: 'PREFER TO BUY ELSEWHERE',
+  didnt_work: "DIDN'T WORK",
+  too_many_tins: 'TOO MANY TINS',
+  melted: 'MELTED',
+  order_as_needed: 'PREFER TO ORDER AS NEEDED',
+  didnt_mean: "DIDN'T MEAN TO SUBSCRIBE",
+  bad_reviews: 'BAD REVIEWS',
+};
+
+const crumbMap = {
+  start: 'Start',
+  check_order_status: 'Order status',
+  check_sub_status: 'Sub timing',
+  action_push_sub: 'Push sub',
+  reason_known: 'Reason?',
+  request_reason: 'Request reason',
+  request_reason_return: 'Returning',
+  request_reason_checkin: 'Check-in',
+  select_reason: 'Select reason',
+  stage2_offer: 'Send offer',
+  stage2_offer_return: 'Returning',
+  stage2_checkin: 'Check-in',
+  stage2_checkin_return: 'Returning',
+  stage3_response: 'Customer response',
+  outcome_accepted: 'Winback accepted',
+  outcome_rejected: 'Winback rejected',
+  cancel_no_reply: 'No reply',
+  cancel_no_reply_offer: 'No reply',
+  ineligible_onetime: 'Ineligible',
+  ineligible_orderonly: 'Ineligible',
+  ineligible_direct: 'Ineligible',
+  ineligible_tagged: 'Ineligible',
+};
+
+function crumb(s) { return crumbMap[s] || s; }
+
+// ── Encode / decode ──────────────────────────────────────────
+function encodeState(snoozePoint) {
+  const sp = { request_reason: 'RR', winback_offered: 'WO', winback_checkin: 'WC' };
+  const os = { stage10: '1', stage20: '2', shipped: 'S', none: 'N' };
+  const ss = { soon: 'S', later: 'L' };
+  const rc = { too_expensive: 'A', buy_elsewhere: 'B', didnt_work: 'C', too_many_tins: 'D', melted: 'E', order_as_needed: 'F', didnt_mean: 'G', bad_reviews: 'H' };
+  return (sp[snoozePoint] || 'XX') + (os[S.orderStatus] || '0') + (ss[S.subStatus] || '0') + (rc[S.reason] || '0');
+}
+
+function decodeCode(code) {
+  code = code.toUpperCase().trim();
+  if (code.length !== 5) return null;
+  const sm = { RR: 'request_reason_return', WO: 'stage2_offer_return', WC: 'stage2_checkin_return' };
+  const om = { '1': 'stage10', '2': 'stage20', S: 'shipped', N: 'none', '0': null };
+  const subm = { S: 'soon', L: 'later', '0': null };
+  const rm = { A: 'too_expensive', B: 'buy_elsewhere', C: 'didnt_work', D: 'too_many_tins', E: 'melted', F: 'order_as_needed', G: 'didnt_mean', H: 'bad_reviews', '0': null };
+  const sc = code.slice(0, 2);
+  if (!sm[sc]) return null;
+  if (om[code[2]] === undefined || subm[code[3]] === undefined || rm[code[4]] === undefined) return null;
+  return { step: sm[sc], orderStatus: om[code[2]], subStatus: subm[code[3]], reason: rm[code[4]] };
+}
+
+// ── Navigation ───────────────────────────────────────────────
+function go(next, key, val) {
+  S.path.push(S.step);
+  if (key) S[key] = val;
+  S.step = next;
+  render();
+}
+
+function goBack() {
+  if (!S.path.length) return;
+  S.step = S.path.pop();
+  S.resumed = false;
+  render();
+}
+
+function restart() {
+  Object.assign(S, { step: 'start', path: [], reason: null, orderStatus: null, subStatus: null, resumed: false });
+  render();
+}
+
+function tryResume() {
+  const val = document.getElementById('resume-input').value;
+  const decoded = decodeCode(val);
+  if (!decoded) {
+    document.getElementById('resume-input').classList.add('error');
+    document.getElementById('resume-error').style.display = 'block';
+    return;
+  }
+  Object.assign(S, decoded, { resumed: true, path: [] });
+  render();
+}
+
+function copyCode(code) {
+  navigator.clipboard.writeText('Winback resume code: ' + code).then(() => {
+    const btn = document.getElementById('cb-' + code);
+    if (btn) { btn.textContent = 'Copied!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = 'Copy to clipboard'; btn.classList.remove('copied'); }, 2000); }
+  });
+}
+
+// ── Helpers ──────────────────────────────────────────────────
+function navBtns() {
+  if (!S.path.length) return '';
+  let h = '<div class="nav-btns">';
+  h += '<button class="nav-btn" onclick="goBack()">← Back</button>';
+  h += '<button class="nav-btn" onclick="restart()">↺ Start over</button>';
+  h += '</div>';
+  return h;
+}
+
+function bc() {
+  if (!S.path.length) return '';
+  let h = '<div class="breadcrumb">';
+  S.path.forEach(p => { h += `<span class="crumb">${crumb(p)}</span><span class="crumb-sep"> › </span>`; });
+  h += `<span class="crumb" style="color:var(--text)">${crumb(S.step)}</span></div>`;
+  return h;
+}
+
+function card(stage, question, sub, body) {
+  const rt = S.resumed ? '<span class="resumed-tag">Resumed from snooze</span><br>' : '';
+  return `${bc()}${navBtns()}<div class="card">${rt}${stage ? `<div class="card-stage">${stage}</div>` : ''}<div class="question">${question}</div>${sub ? `<div class="sub">${sub}</div>` : ''}${body}</div>`;
+}
+
+function btns(choices) {
+  return '<div class="btn-group">' + choices.map(([icon, label, fn]) =>
+    `<button class="btn" onclick="${fn}"><span class="btn-icon">${icon}</span><span>${label}</span></button>`
+  ).join('') + '</div>';
+}
+
+function macros(...names) {
+  return '<div class="macros-row">' + names.map(n => `<span class="macro-pill">${n}</span>`).join('') + '</div>';
+}
+
+function sysGrid(dcl, shopify, stay, gorgias) {
+  return `<div class="system-grid">
+    <div class="system-card sys-dcl"><div class="sys-label">DCL</div><div class="sys-content">${dcl}</div></div>
+    <div class="system-card sys-shopify"><div class="sys-label">Shopify</div><div class="sys-content">${shopify}</div></div>
+    <div class="system-card sys-stay"><div class="sys-label">Stay</div><div class="sys-content">${stay}</div></div>
+    <div class="system-card sys-gorgias"><div class="sys-label">Gorgias</div><div class="sys-content">${gorgias}</div></div>
+  </div>`;
+}
+
+function saveBox(snoozePoint) {
+  const code = encodeState(snoozePoint);
+  const labels = {
+    request_reason: 'Waiting for cancellation reason',
+    winback_offered: 'Winback offer sent — waiting for reply',
+    winback_checkin: 'Check-in sent — waiting for reply'
+  };
+  return `<div class="save-box">
+    <div class="save-box-title">Save this code in Gorgias before you snooze</div>
+    <span class="save-code">${code}</span>
+    <div class="save-sublabel">${labels[snoozePoint] || ''}</div>
+    <div class="save-instructions">Click <strong>Copy to clipboard</strong>, then add to an internal note in Gorgias.</div>
+    <button class="copy-btn" id="cb-${code}" onclick="copyCode('${code}')">Copy to clipboard</button>
+  </div>`;
+}
+
+function outcomeCard(type, title, gridSections, tip) {
+  const cls = type === 'success' ? 'outcome-success' : 'outcome-cancel';
+  let h = `${bc()}${navBtns()}<div class="outcome ${cls}"><div class="outcome-title">${title}</div>`;
+  // Render as system grid with colored cards, two per row
+  h += '<div class="system-grid">';
+  gridSections.forEach(([sys, items]) => {
+    const sysClass = { DCL: 'sys-dcl', Shopify: 'sys-shopify', Stay: 'sys-stay', Gorgias: 'sys-gorgias', Note: 'sys-gorgias' }[sys] || 'sys-dcl';
+    const filtered = items.filter(Boolean);
+    h += `<div class="system-card ${sysClass}"><div class="sys-label">${sys}</div><div class="sys-content">`;
+    if (filtered.length === 1) {
+      h += filtered[0];
+    } else {
+      h += '<ul style="list-style:none;padding:0;margin:0">';
+      filtered.forEach(i => { h += `<li style="padding:3px 0 3px 12px;position:relative;"><span style="position:absolute;left:0;top:8px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.5;display:inline-block"></span>${i}</li>`; });
+      h += '</ul>';
+    }
+    h += '</div></div>';
+  });
+  h += '</div>';
+  if (tip) h += `<div class="tip-box" style="margin-top:4px">${tip}</div>`;
+  h += '</div>';
+  return h;
+}
+
+// ── DCL helpers ──────────────────────────────────────────────
+function dclCancelText() {
+  if (!S.orderStatus || S.orderStatus === 'none') return 'No unfulfilled order — no action needed';
+  if (S.orderStatus === 'stage10') return 'Stage 10 — cancel the order directly';
+  if (S.orderStatus === 'stage20') return 'Stage 20 — put on hold: "Please cancel — XX"';
+  if (S.orderStatus === 'shipped') return 'Stage 40/60 — follow the Can\'t Cancel process';
+  return '';
+}
+
+function shopifyCancelText() {
+  if (!S.orderStatus || S.orderStatus === 'none') return 'No unfulfilled order — no action needed';
+  return 'Wait for DCL cancellation, then cancel and refund in Shopify';
+}
+
+// ── Render ───────────────────────────────────────────────────
+function render() {
+  const s = S.step;
+  let html = '';
+
+  if (s === 'start') {
+    html = `<div class="card">
+      <div class="card-stage">Stage 1 — Eligibility check</div>
+      <div class="question">What is the customer requesting?</div>
+      <div class="sub">Review the ticket carefully before selecting. Check their Shopify profile for an existing winback tag.</div>
+      ${btns([
+        ['✅', 'Cancel an active subscription (with or without an unfulfilled order)', "go('check_order_status')"],
+        ['✅', 'Cancel an unfulfilled order AND an active subscription', "go('check_order_status')"],
+        ['❌', 'Cancel a one-time order only (no subscription)', "go('ineligible_onetime')"],
+        ['❌', 'Cancel an order only — has an active subscription but only wants to cancel the order', "go('ineligible_orderonly')"],
+        ['❌', 'Upset / complaint', "go('ineligible_direct')"],
+        ['❌', 'Taste or medical reaction / reason', "go('ineligible_direct')"],
+        ['❌', "Can't afford it / was overdrafted (has active sub + unfulfilled order)", "go('ineligible_direct')"],
+        ['❌', 'Already has a winback tag on Shopify profile', "go('ineligible_tagged')"],
+      ])}
+      <div class="divider"><div class="divider-line"></div><div class="divider-text">returning from a snooze?</div><div class="divider-line"></div></div>
+      <div class="sub" style="margin-bottom:8px">Enter the code saved in your Gorgias internal note to pick up where you left off.</div>
+      <input class="resume-input" id="resume-input" maxlength="5" placeholder="XXXXX" oninput="this.value=this.value.toUpperCase();this.classList.remove('error');document.getElementById('resume-error').style.display='none'" onkeydown="if(event.key==='Enter')tryResume()" />
+      <div class="error-msg" id="resume-error">Code not recognised — please check and try again.</div>
+      <button class="btn" onclick="tryResume()"><span class="btn-icon">↩</span><span>Resume from code</span></button>
+    </div>`;
+
+  } else if (s === 'check_order_status') {
+    html = card('Stage 1 — Order status', 'What is the current order status in DCL?', null,
+      btns([
+        ['📋', 'Unfulfilled — Stage 10 in DCL', "go('check_sub_status','orderStatus','stage10')"],
+        ['📋', 'Unfulfilled — Stage 20 in DCL', "go('check_sub_status','orderStatus','stage20')"],
+        ['🚚', 'Already shipped — Stage 40 or 60 in DCL', "go('check_sub_status','orderStatus','shipped')"],
+        ['—', 'No unfulfilled order', "go('check_sub_status','orderStatus','none')"],
+      ]));
+
+  } else if (s === 'check_sub_status') {
+    html = card('Stage 1 — Subscription timing', "When is the customer's next subscription order due?", null,
+      btns([
+        ['⚡', '7 days or fewer from today', "go('action_push_sub','subStatus','soon')"],
+        ['✓', '8 or more days from today', "go('reason_known','subStatus','later')"],
+      ]));
+
+  } else if (s === 'action_push_sub') {
+    const body = `<div class="action-box"><strong>In Stay.ai:</strong> Move the next order date to <strong>8 days from today</strong> before continuing.</div>` +
+      sysGrid('No action yet', 'No action yet', 'Move next order to 8 days out', 'Complete internal note') +
+      macros('WINBACK - TRIAGE NOTES [Internal]') +
+      `<button class="confirm-btn" onclick="go('reason_known','subStatus','soon')">✓ Done — date has been moved</button>`;
+    html = card('Stage 1 — Action required', 'Move the next subscription order date in Stay.ai.', null, body);
+
+  } else if (s === 'reason_known') {
+    const needsHold = S.orderStatus === 'stage10' || S.orderStatus === 'stage20';
+    const holdNote = needsHold
+      ? `<div class="action-box"><strong>In DCL:</strong> Put the order on hold with the note: <strong>"Hold for customer reply — [your initials]"</strong> before continuing.</div>${macros('WINBACK - TRIAGE NOTES [Internal]')}`
+      : '';
+    html = card('Stage 1 — Cancellation reason', 'Has the customer given you their reason for cancelling?', null,
+      holdNote + btns([
+        ['✅', 'Yes — I have their reason', "go('select_reason')"],
+        ['❓', 'No — reason not yet given', "go('request_reason')"],
+      ]));
+
+  } else if (s === 'request_reason') {
+    const shipped = S.orderStatus === 'shipped';
+    const body =
+      `<div class="tip-box">💡 Always draft your reply to the customer before taking action in Shopify or Stay.</div>` +
+      `<div class="info-box">Send the <strong>WINBACK - REASON NEEDED</strong> macro.${shipped ? ' Include the <strong>WINBACK - CAN\'T CANCEL ORDER - [ADD ON]</strong> conditional — their order has already shipped.' : ''} Then snooze for <strong>2 days</strong>.</div>` +
+      sysGrid(
+        S.orderStatus === 'stage10' ? 'Stage 10 — on hold for reply'
+          : S.orderStatus === 'stage20' ? 'Stage 20 — on hold for reply'
+          : S.orderStatus === 'shipped' ? 'Stage 40/60 — Can\'t Cancel process'
+          : 'No action needed',
+        'No action yet',
+        'No action yet',
+        'Send reason needed macro, complete internal note, snooze 2 days'
+      ) +
+      macros('WINBACK - REASON NEEDED', 'WINBACK - PROGRESS NOTES [Internal]') +
+      saveBox('request_reason') +
+      btns([
+        ['💬', 'Customer replied with a reason', "go('select_reason')"],
+        ['😶', 'No reply after 2 days', "go('request_reason_checkin')"],
+      ]);
+    html = card('Stage 1 — Request reason', "Ask the customer why they'd like to cancel.", null, body);
+
+  } else if (s === 'request_reason_return') {
+    html = card('Stage 1 — Returning from snooze', 'Did the customer reply with their cancellation reason?', null,
+      btns([
+        ['💬', 'Yes — they replied with a reason', "go('select_reason')"],
+        ['😶', 'No reply yet', "go('request_reason_checkin')"],
+      ]));
+
+  } else if (s === 'request_reason_checkin') {
+    const body =
+      `<div class="info-box">Send the <strong>WINBACK - CHECK-IN</strong> macro using the <strong>"CHECK-IN AFTER REASON NEEDED"</strong> conditional. Snooze for <strong>2 more days</strong>.</div>` +
+      macros('WINBACK - CHECK-IN', 'WINBACK - PROGRESS NOTES [Internal]') +
+      saveBox('request_reason') +
+      btns([
+        ['💬', 'Customer replied with a reason', "go('select_reason')"],
+        ['🚫', 'Still no reply — proceed to cancel', "go('cancel_no_reply')"],
+      ]);
+    html = card('Stage 1 — No reply check-in', 'Send a check-in and snooze 2 more days.', null, body);
+
+  } else if (s === 'select_reason') {
+    html = card('Stage 1 → Stage 2', "Select the customer's cancellation reason:", null,
+      btns([
+        ['💰', 'Too expensive', "go('stage2_offer','reason','too_expensive')"],
+        ['🛒', 'Prefer to buy elsewhere', "go('stage2_offer','reason','buy_elsewhere')"],
+        ['❓', "Product didn't work", "go('stage2_offer','reason','didnt_work')"],
+        ['📦', 'Too many tins', "go('stage2_offer','reason','too_many_tins')"],
+        ['🌡', 'Product melted', "go('stage2_offer','reason','melted')"],
+        ['🔄', 'Prefer to order as needed', "go('stage2_offer','reason','order_as_needed')"],
+        ['🤷', "Didn't mean to subscribe", "go('stage2_offer','reason','didnt_mean')"],
+        ['⭐', 'Bad reviews', "go('stage2_offer','reason','bad_reviews')"],
+      ]));
+
+  } else if (s === 'stage2_offer' || s === 'stage2_offer_return') {
+    const conditional = reasonConditionals[S.reason] || '';
+    const shipped = S.orderStatus === 'shipped';
+    const isReturn = s === 'stage2_offer_return';
+    const body =
+      `<div class="tip-box">💡 Always draft your reply to the customer before taking action in Shopify or Stay.</div>` +
+      (isReturn ? '' :
+        `<div class="info-box">Reply using the <strong>WINBACK - OFFER</strong> macro, selecting the <strong>"${conditional}"</strong> conditional.${shipped ? ' Include the <strong>WINBACK - CAN\'T CANCEL ORDER - [ADD ON]</strong> conditional.' : ''} Use the appropriate offer conditional based on whether there is an unfulfilled order or not. Then snooze for <strong>2 days</strong>.</div>` +
+        sysGrid(
+          S.orderStatus === 'stage10' || S.orderStatus === 'stage20' ? 'Remains on hold for customer reply'
+            : S.orderStatus === 'shipped' ? 'Stage 40/60 — Can\'t Cancel process'
+            : 'No action needed',
+          'Tag profile: <strong>winback-offered</strong> (auto-applies via macro)',
+          'No action yet',
+          'Send offer macro, complete internal note, snooze 2 days'
+        ) +
+        macros('WINBACK - OFFER', 'WINBACK - PROGRESS NOTES [Internal]') +
+        saveBox('winback_offered')
+      ) +
+      btns([
+        ['💬', 'Customer replied', "go('stage3_response')"],
+        ['😶', 'No reply after 2 days', "go('stage2_checkin')"],
+      ]);
+    html = card(
+      isReturn ? 'Stage 2 — Returning from snooze' : 'Stage 2 — Winback offer',
+      isReturn ? 'Did the customer reply to the winback offer?' : `Send the winback offer — reason: ${conditional}`,
+      null, body);
+
+  } else if (s === 'stage2_checkin' || s === 'stage2_checkin_return') {
+    const body =
+      `<div class="info-box">Send the <strong>WINBACK - CHECK-IN</strong> macro using the <strong>"CHECK-IN AFTER WINBACK OFFER"</strong> conditional. Snooze for <strong>2 more days</strong>. This is the final snooze.</div>` +
+      macros('WINBACK - CHECK-IN', 'WINBACK - PROGRESS NOTES [Internal]') +
+      saveBox('winback_checkin') +
+      btns([
+        ['💬', 'Customer replied', "go('stage3_response')"],
+        ['🚫', 'No reply after 2nd snooze — proceed to cancel', "go('cancel_no_reply_offer')"],
+      ]);
+    html = card('Stage 2 — No reply check-in', 'Send a check-in. This is the final attempt.', null, body);
+
+  } else if (s === 'stage3_response') {
+    html = card('Stage 3 — Customer response', 'Did the customer accept the winback offer?', null,
+      btns([
+        ['🎉', 'Yes — they accepted', "go('outcome_accepted')"],
+        ['❌', 'No — they declined', "go('outcome_rejected')"],
+      ]));
+
+  } else if (s === 'outcome_accepted') {
+    const shipped = S.orderStatus === 'shipped';
+    const hasOrder = S.orderStatus && S.orderStatus !== 'none';
+    html = outcomeCard('success', 'Winback accepted', [
+      ['DCL', [
+        shipped || !hasOrder
+          ? 'No action needed'
+          : 'Remove hold note and release the order (unless customer also requested order cancellation)',
+      ]],
+      ['Shopify', [
+        'Tag profile: winback-accepted (auto-applies via macro)',
+        shipped ? 'Refund the order as initiated' : hasOrder ? 'No action needed — order releasing via DCL' : 'No action needed',
+      ]],
+      ['Stay', ['Apply discount code CXSUBSAVE40 to the customer\'s subscription']],
+      ['Gorgias', [
+        'Reply using the WINBACK - ACCEPTED macro with the correct conditionals',
+        shipped ? 'Include WINBACK - CAN\'T CANCEL ORDER - [ADD ON] conditional' : '',
+        'Complete WINBACK - PROGRESS NOTES [Internal] — confirm tags, contact reason, and resolution are correct',
+        'Close the ticket',
+      ]],
+    ], '💡 Always draft your reply before taking action in Shopify or Stay.');
+
+  } else if (s === 'outcome_rejected') {
+    const shipped = S.orderStatus === 'shipped';
+    html = outcomeCard('cancel', 'Winback rejected — proceed to cancellation', [
+      ['DCL', [
+        S.orderStatus === 'stage10' ? 'Stage 10 — cancel the order'
+          : S.orderStatus === 'stage20' ? 'Stage 20 — edit hold note to "Please cancel — XX", wait for DCL to action'
+          : S.orderStatus === 'shipped' ? 'Stage 40/60 — no DCL action needed'
+          : 'No unfulfilled order — no action needed',
+      ]],
+      ['Shopify', [
+        'Tag profile: winback-rejected (auto-applies via macro)',
+        shipped ? 'Refund the order in Shopify' : S.orderStatus !== 'none' ? 'Wait for DCL cancellation, then cancel and refund in Shopify' : 'No action needed',
+      ]],
+      ['Stay', ['Cancel the subscription via the Gorgias widget or Stay Dashboard']],
+      ['Gorgias', [
+        'Reply using the WINBACK - REJECTED macro with the correct conditionals',
+        shipped ? 'Include WINBACK - CAN\'T CANCEL ORDER - [ADD ON] conditional' : '',
+        'Complete WINBACK - PROGRESS NOTES [Internal] — confirm tags, contact reason, and resolution are correct',
+        'Close the ticket',
+      ]],
+    ], '💡 Always draft your reply before taking action in Shopify or Stay.');
+
+  } else if (s === 'cancel_no_reply' || s === 'cancel_no_reply_offer') {
+    const shipped = S.orderStatus === 'shipped';
+    const label = s === 'cancel_no_reply' ? 'No reply — proceed to cancellation' : 'No reply to offer — proceed to cancellation';
+    html = outcomeCard('cancel', label, [
+      ['DCL', [dclCancelText()]],
+      ['Shopify', [shopifyCancelText()]],
+      ['Stay', ['Cancel the subscription via the Gorgias widget or Stay Dashboard']],
+      ['Gorgias', [
+        'Reply using the WINBACK - REJECTED macro, selecting the "NO REPLY" conditional',
+        shipped ? 'Include WINBACK - CAN\'T CANCEL ORDER - [ADD ON] conditional' : '',
+        'Complete WINBACK - PROGRESS NOTES [Internal] — confirm tags, contact reason, and resolution are correct',
+        'Close the ticket',
+      ]],
+    ], '💡 Always draft your reply before taking action in Shopify or Stay.');
+
+  } else if (s === 'ineligible_onetime') {
+    html = outcomeCard('cancel', 'No winback — one-time order cancellation', [
+      ['DCL', ['Stage 10 — cancel the order', 'Stage 20 — put on hold: "Please cancel — XX"', 'Stage 40/60 — follow the Can\'t Cancel process', 'No unfulfilled order — no action needed']],
+      ['Shopify', ['Wait for DCL cancellation, then cancel and refund in Shopify', 'No unfulfilled order — no action needed']],
+      ['Stay', ['No subscription to address — no action needed']],
+      ['Gorgias', ['Complete WINBACK - TRIAGE NOTES [Internal] — mark as NOT eligible, note reason', 'Reply using the CANCEL ORDER macro with the correct conditionals', 'Close the ticket']],
+    ], '💡 Always draft your reply before taking action in Shopify or Stay.');
+
+  } else if (s === 'ineligible_orderonly') {
+    html = outcomeCard('cancel', 'No winback — order cancellation only', [
+      ['DCL', ['Stage 10 — cancel the order', 'Stage 20 — put on hold: "Please cancel — XX"', 'Stage 40/60 — follow the Can\'t Cancel process', 'No unfulfilled order — no action needed']],
+      ['Shopify', ['Wait for DCL cancellation, then cancel and refund in Shopify', 'No unfulfilled order — no action needed']],
+      ['Stay', ['Customer wants to keep their subscription — no action needed']],
+      ['Gorgias', ['Complete WINBACK - TRIAGE NOTES [Internal] — mark as NOT eligible, note reason', 'Reply using the CANCEL ORDER macro with the correct conditionals', 'Close the ticket']],
+    ], '💡 Always draft your reply before taking action in Shopify or Stay.');
+
+  } else if (s === 'ineligible_direct') {
+    html = outcomeCard('cancel', 'No winback — proceed to cancellation', [
+      ['DCL', ['Stage 10 — cancel the order', 'Stage 20 — put on hold: "Please cancel — XX"', 'Stage 40/60 — follow the Can\'t Cancel process', 'No unfulfilled order — no action needed']],
+      ['Shopify', ['Wait for DCL cancellation, then cancel and refund in Shopify', 'No unfulfilled order — no action needed']],
+      ['Stay', ['Cancel the subscription via the Gorgias widget or Stay Dashboard']],
+      ['Gorgias', ['Complete WINBACK - TRIAGE NOTES [Internal] — mark as NOT eligible, note reason', 'Reply using the CANCEL ORDER macro with the correct conditionals', 'Close the ticket']],
+    ], '💡 Always draft your reply before taking action in Shopify or Stay.');
+
+  } else if (s === 'ineligible_tagged') {
+    html = outcomeCard('cancel', 'No winback — already tagged in Shopify', [
+      ['Note', ['This customer has already gone through the winback flow. A winback tag exists on their Shopify profile. Do not attempt another winback.']],
+      ['DCL', ['Stage 10 — cancel the order', 'Stage 20 — put on hold: "Please cancel — XX"', 'Stage 40/60 — follow the Can\'t Cancel process', 'No unfulfilled order — no action needed']],
+      ['Shopify', ['Wait for DCL cancellation, then cancel and refund in Shopify', 'No unfulfilled order — no action needed']],
+      ['Stay', ['Cancel the subscription via the Gorgias widget or Stay Dashboard']],
+      ['Gorgias', ['Complete WINBACK - TRIAGE NOTES [Internal] — mark as NOT eligible, note reason', 'Reply using the CANCEL ORDER macro with the correct conditionals', 'Close the ticket']],
+    ], '💡 Always draft your reply before taking action in Shopify or Stay.');
+  }
+
+  document.getElementById('app').innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>
